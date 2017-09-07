@@ -6,7 +6,7 @@
 /*   By: sescolas <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/06 17:56:52 by sescolas          #+#    #+#             */
-/*   Updated: 2017/09/06 19:26:27 by sescolas         ###   ########.fr       */
+/*   Updated: 2017/09/06 19:37:56 by sescolas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,18 @@
 #include "ft_encrypt.h"
 #include "libft.h"
 
-unsigned char	ft_b64_e(int ix)
+static unsigned char	ft_b64_e(int ix)
 {
-	return ((unsigned char)B64_ENC[(int)ix]);
+	if ((int)ix > 25)
+		return ((unsigned char)B64_ENC_2[(int)ix - 26]);
+	return ((unsigned char)B64_ENC_1[(int)ix]);
 }
 
 /*
 ** 3 8-bit chars to 4 6-bit chars
 */
-unsigned char	*ft_b64encode_chunk(unsigned char *msg, int len)
+
+static unsigned char	*ft_b64encode_chunk(unsigned char *msg, int len)
 {
 	unsigned char	ret[4];
 
@@ -42,23 +45,22 @@ unsigned char	*ft_b64encode_chunk(unsigned char *msg, int len)
 	return ((unsigned char *)ft_strdup((char *)ret));
 }
 
-unsigned char	*ft_b64encode(int fd)
+unsigned char			*ft_b64encode(int fd)
 {
 	unsigned char	enc[1024];
 	unsigned char	buf[4];
 	int				ret;
 
 	if (fd < 0)
-		return ((void *)0); // need to classify this error : inappropriate file descriptor
+		return ((void *)0);
 	ft_bzero(&buf, 4);
 	while ((ret = read(fd, &buf, 3)) > 0)
 		ft_strncat((char *)enc, (char *)ft_b64encode_chunk(buf, ret), ret + 1);
 	return ((unsigned char *)ft_strdup((char *)enc));
 }
 
-int		main(int argc, char **argv)
+int						main(int argc, char **argv)
 {
 	printf("%s\n", ft_b64encode(STDIN_FILENO));
 	return (0);
 }
-
